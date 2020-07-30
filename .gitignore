@@ -1,5 +1,6 @@
 venv/*
 imageSet/*
 p5parameters.txt
+__pycache__
 output.mp4
 config.json

@@ -2,3 +2,4 @@ venv/*
 imageSet/*
 p5parameters.txt
 output.mp4
+config.json

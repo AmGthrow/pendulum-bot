@@ -2,17 +2,18 @@
     automate.py - generates an mp4 file with the double pendulum video I want to upload, as well as a text file with the pendulum's
     parameters written into it
 '''
-import os, shutil, time, glob, tarfile, sys, posttweet
+import os, shutil, time, glob, tarfile, sys, posttweet, json
 import pyinputplus as pyip
 from twython import Twython
 from pathlib import Path
 from selenium import webdriver
 
+config_file = open('config.json')
+config_values = json.load(config_file)
+DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])
 
-DOWNLOADS_FOLDER = Path(r'C:\Users\jsmod\Downloads') # Point this to wherever your browser downloads files. This is where python accesses the files generated from p5js
 
-
-# os.chdir(os.path.dirname(sys.argv[0]))  # Just to make sure that the working dirctory is where this script is located
+os.chdir(os.path.dirname(sys.argv[0]))  # Just to make sure that the working dirctory is where this script is located
 
 START_TIME = time.time()
 FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
@@ -31,8 +32,6 @@ def main():
         os.mkdir(IMAGE_FOLDER)
 
     # Delete old image sets, txt files, and mp4 files before proceeding
-    if os.path.exists(OUTPUT_FILE):
-        os.unlink(OUTPUT_FILE)
     if os.path.exists(FILENAME_PARAMETERS):
         os.unlink(FILENAME_PARAMETERS)
     for image in os.listdir(IMAGE_FOLDER):
@@ -58,6 +57,9 @@ def main():
     tarFile.close()
     os.unlink(DOWNLOADED_TAR)
 
+
+    if os.path.exists(OUTPUT_FILE): # delete the previous OUTPUT_FILE before telling FFMPEG to render another one
+        os.unlink(OUTPUT_FILE)
 
     print('Now generating mp4...')
     # Instruct CCapture to make an mp4 from the image set

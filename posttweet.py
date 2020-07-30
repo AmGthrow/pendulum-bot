@@ -1,5 +1,5 @@
 ''' 
-    posttweet.py - tweets the mp4 file that I generated using automate.py
+    posttweet.py - tweets the mp4 file that was generated using automate.py
 '''
 from pathlib import Path
 from twython import Twython
@@ -17,16 +17,20 @@ IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture 
 
 def tweet():
     # Capture the parameters used in the p5 sketch. This is the text I'm going to tweet
-    parameters = open(FILENAME_PARAMETERS, 'r', encoding='utf-8')
-    message = parameters.read()
-    parameters.close()
+    try:
+        parameters = open(FILENAME_PARAMETERS, 'r', encoding='utf-8')
+        video = open(OUTPUT_FILE, 'rb')
+        message = parameters.read()
+        parameters.close()
+    except FileNotFoundError:
+        print("Couldn't find an existing output. Try running automate.py first.\n\nNo longer sending tweet...")
+        exit()
     print(message)
 
     twitter = Twython(config_values["CONSUMER_KEY"], config_values["CONSUMER_SECRET"], config_values["API_KEY"], config_values["API_SECRET"])
 
-    video = open(OUTPUT_FILE, 'rb')
     response = twitter.upload_video(media=video,media_type='video/mp4')
-    # twitter.update_status(status=message, media_ids=[response['media_id']])
+    twitter.update_status(status=message, media_ids=[response['media_id']])
     print("It's uploaded!")
 
 if __name__ == "__main__":

@@ -1,4 +1,0 @@
-Parameters: a1=32.74° a2=-2.68° r1=1.00m r2=1.00m m1=2.00kg m2=2.00kg
-
-Offset/s:
-r2 offset by 0.01m

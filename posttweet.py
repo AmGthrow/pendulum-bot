@@ -5,7 +5,7 @@ from pathlib import Path
 from twython import Twython
 import sys, os
 
-API_KEYS = Path(r'C:\Users\Jethro\Desktop\twitterAPI.txt')    # Obviously I can't use my real API keys here, so I have an external txt file with all my keys
+API_KEYS = Path(r'C:\Users\jsmod\Desktop\twitterAPI.txt')    # Obviously I can't use my real API keys here, so I have an external txt file with all my keys
 
 
 os.chdir(os.path.dirname(sys.argv[0]))   # Make sure that we're operating where the script actually is

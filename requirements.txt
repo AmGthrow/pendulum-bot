@@ -1,0 +1,4 @@
+pathlib==1.0.1
+PyInputPlus==0.2.10
+selenium==3.141.0
+twython==3.8.2

@@ -37,12 +37,20 @@ def main():
     for image in os.listdir(IMAGE_FOLDER):
         os.unlink(IMAGE_FOLDER / image)
 
-    browser = webdriver.Chrome()
-    browser.get(os.path.abspath('p5js/index.html'))   #NOTE: CCapture starts by itself, so there's no need to manually start recording in the python file
+
+    time.sleep(5)
 
     # Moves the p5parameters.txt file from your downloads to this scripts directory; just for organization
     while not os.path.exists(DOWNLOADS_FOLDER / FILENAME_PARAMETERS):
-        time.sleep(1)
+        browser = webdriver.Chrome()
+        browser.get(os.path.abspath('p5js/index.html'))   #NOTE: CCapture starts by itself, so there's no need to manually start recording in the python file
+        time.sleep(3)
+        try:
+            params = open(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, 'r', encoding='utf=8').read()
+            print('\n' + params)
+            break
+        except:
+            webbrowser.close()
     shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     while not get_new_CCapture():   # Wait for CCapture to download the tar file will all the recorded images

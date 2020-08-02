@@ -50,7 +50,7 @@ def main():
             print('\n' + params)
             break
         except:
-            webbrowser.close()
+            browser.close()
     shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     while not get_new_CCapture():   # Wait for CCapture to download the tar file will all the recorded images

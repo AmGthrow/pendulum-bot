@@ -46,15 +46,20 @@ def get_new_CCapture(newerThan, searchIn = DOWNLOADS_FOLDER):
 
 
 def cleanup():
-    # Delete old image sets
-    for image in os.listdir(IMAGE_FOLDER):
-        os.unlink(IMAGE_FOLDER / image)
+    '''
+    Deletes the following:
+        imageSet / *.png
+        output.mp4
+        p5parameters.txt
 
-    # delete the previous output.mp4 and p5parameters.txt before putting new ones into the working directory
+    '''
+    for image in glob.glob(IMAGE_FOLDER / '*.png'):
+        os.unlink(image)
     if os.path.exists(OUTPUT_FILE):
         os.unlink(OUTPUT_FILE)
     if os.path.exists(FILENAME_PARAMETERS):
         os.unlink(FILENAME_PARAMETERS)
+
 
 def browser_options():
     '''

@@ -47,8 +47,6 @@ def main():
         os.mkdir(IMAGE_FOLDER)
 
     # Delete old image sets, txt files, and mp4 files before proceeding
-    if os.path.exists(FILENAME_PARAMETERS):
-        os.unlink(FILENAME_PARAMETERS)
     for image in os.listdir(IMAGE_FOLDER):
         os.unlink(IMAGE_FOLDER / image)
 
@@ -80,7 +78,6 @@ def main():
             break
         except:
             browser.close()
-    shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     while not get_new_CCapture():   # Wait for CCapture to download the tar file will all the recorded images
         time.sleep(1)
@@ -93,9 +90,12 @@ def main():
     tarFile.close()
     os.unlink(DOWNLOADED_TAR)
 
-    # delete the previous OUTPUT_FILE before telling FFMPEG to render another one
+    # delete the previous output.mp4 and p5parameters.txt before putting new ones into the working directory
     if os.path.exists(OUTPUT_FILE):
         os.unlink(OUTPUT_FILE)
+    if os.path.exists(FILENAME_PARAMETERS):
+        os.unlink(FILENAME_PARAMETERS)
+    shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     print('Now generating mp4...')
     # Instruct CCapture to make an mp4 from the image set

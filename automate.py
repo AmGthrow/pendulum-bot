@@ -8,6 +8,11 @@ from twython import Twython
 from pathlib import Path
 from selenium import webdriver
 
+FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
+OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
+IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
+
+
 config_file = open('config.json')
 config_values = json.load(config_file)
 DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])
@@ -16,10 +21,7 @@ DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])
 os.chdir(os.path.dirname(sys.argv[0]))  # Just to make sure that the working dirctory is where this script is located
 
 START_TIME = time.time()
-FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
 
-OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
-IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
 
 def get_new_CCapture(): # Searches for a .tar file in the downloads folder that was created later than {start_time}.
                         # This should be the .tar file that you create upon running this script

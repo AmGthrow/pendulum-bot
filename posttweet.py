@@ -30,6 +30,7 @@ def tweet():
     twitter = Twython(config_values["CONSUMER_KEY"], config_values["CONSUMER_SECRET"], config_values["API_KEY"], config_values["API_SECRET"])
 
     response = twitter.upload_video(media=video,media_type='video/mp4')
+    video.close()
     twitter.update_status(status=message, media_ids=[response['media_id']])
     print("It's uploaded!")
 

@@ -106,5 +106,5 @@ while True:   # Sometimes I have an output file that's ready to go so I just twe
         main()
     except KeyboardInterrupt:   # I like to use a keyboard interrupt when I want to try rendering a different pendulum
         print("Yikes, guess you didn't like that one")
-    if pyip.inputYesNo("Do you want me to render a new video? ") == 'no':
+    if pyip.inputYesNo("Do you want me to render a new video? ", default="no", timeout=120) == 'no':
         break

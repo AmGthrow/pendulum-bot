@@ -7,7 +7,7 @@ let btn;
 function record() {
   capturer = new CCapture({
     format: "png",  // the final .mp4 is actually composed of individual .png frames
-    verbose: 'true',
+    verbose: "false",
     quality: 40,
   });
   capturer.start();

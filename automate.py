@@ -97,7 +97,7 @@ def main():
     os.startfile(OUTPUT_FILE)   # I like to to view the video before proceeding
     params = open(DOWNLOADS_FOLDER / FILENAME_PARAMETERS,
                   'r', encoding='utf=8').read()
-    print('\n' + params)
+    print('\n\n' + params + '\n\n')
     print(f'Compilation finished in {time.time() - START_TIME} seconds.')
 
 
@@ -106,5 +106,5 @@ while True:   # Sometimes I have an output file that's ready to go so I just twe
         main()
     except KeyboardInterrupt:   # I like to use a keyboard interrupt when I want to try rendering a different pendulum
         print("Yikes, guess you didn't like that one")
-    if pyip.inputYesNo("Do you want me to render a new video? ", timeout=20) == 'no':
+    if pyip.inputYesNo("Do you want me to render a new video? ") == 'no':
         break

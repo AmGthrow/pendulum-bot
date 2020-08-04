@@ -16,39 +16,54 @@ from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-# Where p5js writes the parameters used
-FILENAME_PARAMETERS = 'p5parameters.txt'
-OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
-# Folder where all the images from CCapture are found
-IMAGE_FOLDER = Path('./imageSet')
-
 
 config_file = open('config.json')
 config_values = json.load(config_file)
-DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])
+
+DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])  # Where your downloads are kept (Python needs this to retrieve files downloaded via javascript)
+config_file.close()
 
 
-# Just to make sure that the working dirctory is where this script is located
-os.chdir(os.path.dirname(sys.argv[0]))
+FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
+OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
+IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
 
-START_TIME = time.time()
 
 
 # Searches for a .tar file in the downloads folder that was created later than {start_time}.
-def get_new_CCapture():
-    # This should be the .tar file that you create upon running this script
-    for file in glob.glob(str(DOWNLOADS_FOLDER / '*.tar')):
-        if os.path.getctime(file) >= START_TIME:
+def get_new_CCapture(newerThan, searchIn = DOWNLOADS_FOLDER):
+    '''
+    Input: 
+        newerThan: a float object (usually from time.time()) that represents the oldest possible time that a .tar file can be
+        searchIn: a Path object pointing to a directory you want to search for tar files
+
+    Output: returns a str object with the filename of a tar file which was created later than newerThan 
+        if more than 1 tar file exists, it returns the one that comes first when arranged alphabetically
+    '''
+    for file in glob.glob(str(searchIn / '*.tar')):
+        if os.path.getctime(file) >= newerThan:
             return file
 
 
-def main():
-    if not os.path.exists(IMAGE_FOLDER):
-        os.mkdir(IMAGE_FOLDER)
-
-    # Delete old image sets, txt files, and mp4 files before proceeding
+def cleanup():
+    # Delete old image sets
     for image in os.listdir(IMAGE_FOLDER):
         os.unlink(IMAGE_FOLDER / image)
+
+    # delete the previous output.mp4 and p5parameters.txt before putting new ones into the working directory
+    if os.path.exists(OUTPUT_FILE):
+        os.unlink(OUTPUT_FILE)
+    if os.path.exists(FILENAME_PARAMETERS):
+        os.unlink(FILENAME_PARAMETERS)
+
+def browser_options():
+    '''
+    Output: an
+    '''
+def main():
+    START_TIME = time.time()
+    if not os.path.exists(IMAGE_FOLDER):
+        os.mkdir(IMAGE_FOLDER)
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -68,23 +83,15 @@ def main():
 
     browser.get(os.path.abspath('p5js/index.html'))
 
-    while not get_new_CCapture():   # Wait for CCapture to download the tar file will all the recorded images
+    while not (DOWNLOADED_TAR := get_new_CCapture(START_TIME)):   # Wait for CCapture to download the tar file will all the recorded images
         time.sleep(1)
     browser.close()
 
     # Extract the contents of the .tar file into an image folder
-    DOWNLOADED_TAR = get_new_CCapture()
     tarFile = tarfile.open(DOWNLOADED_TAR)
     tarFile.extractall(IMAGE_FOLDER)
     tarFile.close()
     os.unlink(DOWNLOADED_TAR)
-
-    # delete the previous output.mp4 and p5parameters.txt before putting new ones into the working directory
-    if os.path.exists(OUTPUT_FILE):
-        os.unlink(OUTPUT_FILE)
-    if os.path.exists(FILENAME_PARAMETERS):
-        os.unlink(FILENAME_PARAMETERS)
-    shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     print('Now generating mp4...')
     # Instruct CCapture to make an mp4 from the image set
@@ -93,6 +100,7 @@ def main():
 
     while not os.path.exists(OUTPUT_FILE):
         time.sleep(1)
+    shutil.move(DOWNLOADS_FOLDER / FILENAME_PARAMETERS, FILENAME_PARAMETERS)
 
     os.startfile(OUTPUT_FILE)   # I like to to view the video before proceeding
     params = open(DOWNLOADS_FOLDER / FILENAME_PARAMETERS,
@@ -101,10 +109,10 @@ def main():
     print(f'Compilation finished in {time.time() - START_TIME} seconds.')
 
 
-while True:   # Sometimes I have an output file that's ready to go so I just tweet that
+while True:
     try:
         main()
-    except KeyboardInterrupt:   # I like to use a keyboard interrupt when I want to try rendering a different pendulum
+    except KeyboardInterrupt:   # I like to use a keyboard interrupt when I want to render a different pendulum
         print("Yikes, guess you didn't like that one")
     if pyip.inputYesNo("Do you want me to render a new video? ", default="no", timeout=120) == 'no':
         break

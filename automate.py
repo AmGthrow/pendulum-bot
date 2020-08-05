@@ -66,6 +66,7 @@ def browser_generate():
     '''
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--log-level=3")    # Disables the log messages from CCapture so I can put my own
     chrome_options.add_experimental_option("prefs", {
         "download.prompt_for_download": False,
     })

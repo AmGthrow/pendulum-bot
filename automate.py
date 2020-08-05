@@ -15,6 +15,7 @@ from twython import Twython
 from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 config_file = open('config.json')
@@ -70,9 +71,11 @@ def browser_generate():
     chrome_options.add_experimental_option("prefs", {
         "download.prompt_for_download": False,
     })
+    d = DesiredCapabilities.CHROME
+    d['goog:loggingPrefs'] = { 'browser':'ALL' }
     chrome_driver = os.path.abspath("chromedriver.exe")   # NOTE: I just half-assedly copy-pasted a chromdriver I downloaded into the folder here, no idea if it actually works when I uninstall the main chromedriver in my machine
     browser = webdriver.Chrome(
-        options=chrome_options, executable_path=chrome_driver)
+        options=chrome_options, executable_path=chrome_driver, desired_capabilities=d)
     browser.command_executor._commands["send_command"] = (
         "POST", '/session/$sessionId/chromium/send_command')
 
@@ -108,7 +111,8 @@ def main():
     browser.get(os.path.abspath('p5js/index.html'))
 
     while not (DOWNLOADED_TAR := get_new_CCapture(START_TIME)):   # Wait for CCapture to download the tar file will all the recorded images
-        time.sleep(1)
+        for entry in browser.get_log('browser'):
+            print(entry)
     browser.close()
 
     cleanup()   # Delete files that were generated from previous executions of automate.py

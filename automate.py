@@ -10,6 +10,7 @@ import tarfile
 import sys
 import posttweet
 import json
+import re
 import pyinputplus as pyip
 from twython import Twython
 from pathlib import Path
@@ -29,6 +30,7 @@ FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters u
 OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
 IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
 
+START_TIME = time.time()
 
 
 # Searches for a .tar file in the downloads folder that was created later than {start_time}.
@@ -72,7 +74,7 @@ def browser_generate():
         "download.prompt_for_download": False,
     })
     d = DesiredCapabilities.CHROME
-    d['goog:loggingPrefs'] = { 'browser':'ALL' }
+    d['goog:loggingPrefs'] = {'browser': 'ALL'}
     chrome_driver = os.path.abspath("chromedriver.exe")   # NOTE: I just half-assedly copy-pasted a chromdriver I downloaded into the folder here, no idea if it actually works when I uninstall the main chromedriver in my machine
     browser = webdriver.Chrome(
         options=chrome_options, executable_path=chrome_driver, desired_capabilities=d)
@@ -84,6 +86,7 @@ def browser_generate():
         'downloadPath': str(DOWNLOADS_FOLDER)}}
     browser.execute("send_command", params)
     return browser
+
 
 def extract_tar(tar_from, folder_to=IMAGE_FOLDER, delete=False):
     '''
@@ -102,17 +105,47 @@ def extract_tar(tar_from, folder_to=IMAGE_FOLDER, delete=False):
         os.unlink(tar_from)
 
 
+def regex_progress(to_search):
+    '''
+    Input: a str object that should indicate which frame is currently being recorded
+        Format:  * "Full Frame! <current frame>" * 
+    
+    Output: an int object containing the frame we're currently rendering
+    '''
+    #  Exit automatically if CCapture is done
+    if "Capturer stop" in to_search:
+        return 900
+    
+    #  Find the current frame if it's not done yet
+    try:
+        frameRegex = re.compile(r'(Full Frame!|Frame:) (\d+)')
+        current_frame = frameRegex.search(to_search).group(2)
+        return int(current_frame)
+    except:
+        return 0    # BUG: Sometimes, python starts looking for "Full Frame! <number>" before CCapture has even begun rendering the first one so sometimes I read regular console logs. 
+                    # This try-except catches that but it's an inelegant way of saying "I didn't render anything yet"
+
+
 def main():
-    START_TIME = time.time()
     if not os.path.exists(IMAGE_FOLDER):
         os.mkdir(IMAGE_FOLDER)
 
     browser = browser_generate()
     browser.get(os.path.abspath('p5js/index.html'))
 
-    while not (DOWNLOADED_TAR := get_new_CCapture(START_TIME)):   # Wait for CCapture to download the tar file will all the recorded images
-        for entry in browser.get_log('browser'):
-            print(entry)
+    browser_log = 'Frame: 0'
+    # Wait for CCapture to render a tar file will all the recorded images
+    while not (current_frame := regex_progress(browser_log)) == 900:
+        try:
+            browser_log = browser.get_log('browser')[-1]['message']
+        except IndexError:
+            pass
+        print(f'{current_frame} of 900', end='\r')    
+        time.sleep(1)
+
+    # Wait for the completed tar file to finish downloading
+    while not (DOWNLOADED_TAR := get_new_CCapture(START_TIME)):
+        time.sleep(1)
     browser.close()
 
     cleanup()   # Delete files that were generated from previous executions of automate.py
@@ -130,7 +163,7 @@ def main():
 
     os.startfile(OUTPUT_FILE)   # Automatically opens the rendered mp4 for viewing
 
-    fparams = open(FILENAME_PARAMETERS,'r', encoding='utf=8')
+    fparams = open(FILENAME_PARAMETERS, 'r', encoding='utf=8')
     params = fparams.read()
     fparams.close()
     print('\n\n' + params + '\n\n')

@@ -34,6 +34,7 @@ WARNING: since `posttweet.py` relies on files that `automate.py` generates, you 
 
 ## Credits
 
+* [p5.js](https://p5js.org/)
 * [CCapture.js](https://github.com/spite/ccapture.js/)
 * [FFmpeg](https://ffmpeg.org/)
 

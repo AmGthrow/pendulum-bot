@@ -1,3 +1,4 @@
+![sample pendulum video](assets/sample.gif)
 # Double Pendulum Twitterbot
 Feel free to follow the bot on [Twitter](https://twitter.com/DatSwingyBoi)!
 

@@ -30,7 +30,7 @@ FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters u
 OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
 IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
 
-START_TIME = time.time()
+START_TIME = 0
 
 
 # Searches for a .tar file in the downloads folder that was created later than {start_time}.
@@ -127,6 +127,7 @@ def regex_progress(to_search):
 
 
 def main():
+    START_TIME = time.time()
     if not os.path.exists(IMAGE_FOLDER):
         os.mkdir(IMAGE_FOLDER)
 

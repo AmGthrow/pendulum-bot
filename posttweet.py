@@ -18,10 +18,9 @@ IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture 
 def tweet():
     # Capture the parameters used in the p5 sketch. This is the text I'm going to tweet
     try:
-        parameters = open(FILENAME_PARAMETERS, 'r', encoding='utf-8')
-        video = open(OUTPUT_FILE, 'rb')
-        message = parameters.read()
-        parameters.close()
+        with open(FILENAME_PARAMETERS, 'r', encoding='utf-8') as parameters:
+            video = open(OUTPUT_FILE, 'rb')
+            message = parameters.read()
     except FileNotFoundError:
         print("Couldn't find an existing output. Try running automate.py first.\n\nNo longer sending tweet...")
         exit()

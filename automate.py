@@ -16,6 +16,7 @@ import pyinputplus as pyip
 from twython import Twython
 from pathlib import Path
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -73,9 +74,11 @@ def browser_generate():
     })
     d = DesiredCapabilities.CHROME
     d['goog:loggingPrefs'] = {'browser': 'ALL'}
-    chrome_driver = os.path.abspath("chromedriver.exe")   # NOTE: I just half-assedly copy-pasted a chromdriver I downloaded into the folder here, no idea if it actually works when I uninstall the main chromedriver in my machine
+
     browser = webdriver.Chrome(
-        options=chrome_options, executable_path=chrome_driver, desired_capabilities=d)
+            ChromeDriverManager().install(),
+            options=chrome_options,
+            desired_capabilities=d)
     browser.command_executor._commands["send_command"] = (
         "POST", '/session/$sessionId/chromium/send_command')
 

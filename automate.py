@@ -2,6 +2,7 @@
     automate.py - generates an mp4 file with the double pendulum video I want to upload, as well as a text file with the pendulum's
     parameters written into it
 '''
+
 import os
 import shutil
 import time
@@ -15,17 +16,15 @@ import pyinputplus as pyip
 from twython import Twython
 from pathlib import Path
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
-config_file = open('config.json')
-config_values = json.load(config_file)
+with open('config.json') as config_file:
+    config_values = json.load(config_file)
 
-DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])  # Where your downloads are kept (Python needs this to retrieve files downloaded via javascript)
-config_file.close()
-
-
+    DOWNLOADS_FOLDER = Path(config_values["DOWNLOADS_FOLDER"])  # Where your downloads are kept (Python needs this to retrieve files downloaded via javascript)
 FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
 OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
 IMAGE_FOLDER = Path('./imageSet')   # Folder where all the images from CCapture are found
@@ -75,9 +74,11 @@ def browser_generate():
     })
     d = DesiredCapabilities.CHROME
     d['goog:loggingPrefs'] = {'browser': 'ALL'}
-    chrome_driver = os.path.abspath("chromedriver.exe")   # NOTE: I just half-assedly copy-pasted a chromdriver I downloaded into the folder here, no idea if it actually works when I uninstall the main chromedriver in my machine
+
     browser = webdriver.Chrome(
-        options=chrome_options, executable_path=chrome_driver, desired_capabilities=d)
+            ChromeDriverManager().install(),
+            options=chrome_options,
+            desired_capabilities=d)
     browser.command_executor._commands["send_command"] = (
         "POST", '/session/$sessionId/chromium/send_command')
 

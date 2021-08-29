@@ -9,7 +9,7 @@ config_file = open('config.json')
 config_values = json.load(config_file)
 
 
-os.chdir(os.path.dirname(sys.argv[0]))   # Make sure that we're operating where the script actually is
+os.chdir(os.path.dirname(os.path.realpath(__file__)))   # Make sure that we're operating where the script actually is
 
 FILENAME_PARAMETERS = 'p5parameters.txt'    # Where p5js writes the parameters used
 OUTPUT_FILE = Path('output.mp4')    # The final mp4 file that FFmpeg exports
